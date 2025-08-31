@@ -1,0 +1,10 @@
+# Crea y corre imagen de docker nginx para el puerto 8080
+docker build -t mi-nginx-dotnet-mysql .
+
+
+# Corre el contenedor
+docker run -p 8080:8080 --name mi_contenedor_nginx -d mi-nginx-dotnet-mysql
+
+# 
+docker build -t mi-nginx-dotnet-mysql .
+docker run -d -p 8080:8080 --name miapp mi-nginx-dotnet-mysql
