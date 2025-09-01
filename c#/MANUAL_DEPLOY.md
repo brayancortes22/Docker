@@ -1,24 +1,31 @@
 # Manual de despliegue: Backend C# + Frontend React en Docker con Nginx y HTTPS
 
 ## Requisitos previos
-- Docker instalado en tu sistema (Windows, Linux o Mac)
+- Docker y Docker Compose instalados en tu sistema (Windows, Linux o Mac)
 - Acceso a los repositorios:
   - Backend: https://github.com/Mari2303/Experiencia-Significativa-Backend-.git
   - Frontend: https://github.com/Mari2303/Experiencias-Significativas-Front.git
 
-## Pasos para construir y ejecutar el contenedor
+## Despliegue rápido con Docker Compose
+
+> **Nota:**  
+> Ahora puedes desplegar toda la solución ejecutando solo el comando:
+> ```sh
+> docker compose up -d
+> ```
+> Esto levantará todos los servicios (backend, frontend, base de datos, nginx, etc.) automáticamente.  
+> Los comandos manuales se dejan en este manual para que puedas estudiar y entender cada paso, especialmente si tienes poco conocimiento de Docker.
+
+## Pasos manuales para construir y ejecutar el contenedor
 
 1. **Clona este repositorio o descarga los archivos Docker (`Dockerfile`, `nginx.conf`, `supervisord.conf`)**
 
 2. **Construye la imagen Docker:**
-
 ```powershell
-# Desde la carpeta donde está el Dockerfile
 docker build -t miapp-back-front .
 ```
 
 3. **Ejecuta el contenedor exponiendo los puertos 8080 (HTTP) y 443 (HTTPS):**
-
 ```powershell
 docker run -d -p 8080:8080 --name contenedor-back-front miapp-back-front
 ```
@@ -53,17 +60,15 @@ Para conectar tu backend, usa la cadena de conexión correspondiente en el archi
 
 **SQL Server**
 ```json
-"DefaultConnection": "Server=localhost,1433;Database=backend;User Id=sa;Password=Sqlserver123$;TrustServerCertificate=True"
+"DefaultConnection": "Server=sqlserver,1433;Database=backend;User Id=sa;Password=Sqlserver123$;TrustServerCertificate=True"
 ```
+> **Importante:** Usa el nombre del servicio (`sqlserver`) en vez de `localhost` para conexiones internas en Docker.
 
 **dentro del contenedor de miapp-back-front**
-
 ```
 cd /app/backend/Entity
 dotnet ef database update --startup-project ../API
-
 ```
-
 
 **MariaDB/MySQL**
 ```json
@@ -113,12 +118,58 @@ services:
 ```
 Así la base de datos y el usuario se crean automáticamente al iniciar el contenedor.
 
-## Solución de problemas
-- Si el contenedor no inicia, revisa los logs con:
-  ```powershell
-  docker logs contenedor-back-front
+## Solución de problemas y errores comunes
+
+### Backend
+
+#### No se puede conectar a SQL Server
+**Mensaje:**  
+A network-related or instance-specific error occurred while establishing a connection to SQL Server...
+
+**Solución:**  
+- Verifica que el backend y SQL Server estén en la misma red de Docker (`docker network inspect`).
+- Usa el nombre del servicio (`sqlserver`) en la cadena de conexión.
+- Espera a que el contenedor SQL Server esté listo antes de ejecutar migraciones.
+
+#### Migraciones no aplicadas
+**Mensaje:**  
+No project was found. Change the current working directory or use the --project option.
+
+**Solución:**  
+- Ejecuta el comando desde la carpeta correcta.
+- Usa el parámetro `--startup-project` si el contexto está en otro proyecto.
+
+#### Verificación de base de datos
+- Usa `sqlcmd` dentro del contenedor para verificar la existencia de la base de datos y tablas.
+
+### Frontend
+
+#### Nginx muestra la página de bienvenida
+**Mensaje:**  
+Welcome to nginx!
+
+**Solución:**  
+- Elimina o renombra `index.nginx-debian.html` en `/var/www/html/` para que Nginx sirva el `index.html` del frontend.
+
+#### Los estilos y scripts no se aplican
+**Mensaje:**  
+Se bloqueó la carga de un módulo de “http://localhost:8080/assets/index-DsMhjVVo.js” debido a un tipo MIME no permitido (“text/plain”).
+
+**Solución:**  
+- Configura correctamente el bloque `/assets/` en `nginx.conf`:
+  ```nginx
+  location /assets/ {
+      alias /var/www/html/assets/;
+      try_files $uri =404;
+      types {
+          text/css css;
+          application/javascript js;
+      }
+  }
   ```
-- Si el frontend o backend no carga, verifica la configuración de los puertos y las rutas en `nginx.conf`.
+- Reinicia Nginx y limpia la caché del navegador.
+
+---
 
 ## Detalles técnicos
 - El backend C# corre en Kestrel (puerto 5000 dentro del contenedor).
