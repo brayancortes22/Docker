@@ -8,7 +8,12 @@ server {
     server_name _;
 
     location / {
-        alias /var/www/html/;
         try_files $uri $uri/ /index.html;
+    }
+
+    location /assets/ {
+        alias /var/www/html/assets/;
+        add_header Content-Type "";
+        try_files $uri =404;
     }
 }
