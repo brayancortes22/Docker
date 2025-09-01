@@ -1,5 +1,3 @@
-Perfecto, Brayan. Aquí tienes una descripción clara y técnica que podrías usar en tu repositorio de GitHub para documentar el propósito y configuración del entorno Docker que estás construyendo:
-
 ---
 
 ## 🐳 Proyecto Dockerizado para Backend C# + Frontend React + MySQL
@@ -15,6 +13,7 @@ Este repositorio contiene la configuración necesaria para levantar un entorno c
 - **Python 3.11+** para tareas adicionales o scripts auxiliares
 - **Node.js 18+** y **npm** para compilar el frontend desarrollado en React
 - **MySQL Client** para realizar migraciones hacia una base de datos MySQL
+- **Sqlserver** para la base de datos SQL Server
 - **Nginx** como proxy inverso para exponer los servicios
 - **Certificados SSL** para habilitar HTTPS local
 
@@ -31,7 +30,7 @@ Al iniciar el contenedor:
    - `/api` para el backend
    - `/app` para el frontend
 5. Se habilita el soporte SSL para navegación segura en local.
-6. Se ejecutan migraciones hacia MySQL si están definidas en el backend.
+6. Se ejecutan migraciones hacia sqlserver si están definidas en el backend.
 
 ---
 
@@ -64,8 +63,6 @@ El contenedor permite dos métodos para incluir el código:
 - `Dockerfile`: Define la imagen base, dependencias y comandos de inicio.
 - `nginx.conf`: Configura el proxy inverso y rutas de acceso.
 - `docker-compose.yml`: Orquesta los servicios (opcional).
-- Scripts de instalación y migración para MySQL.
+- Scripts de instalación y migración para sqlserver.
 
 ---
-
-¿Quieres que te ayude a escribir el Dockerfile o el `nginx.conf`? También podemos armar el `docker-compose.yml` para que todo se levante con un solo comando.

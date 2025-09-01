@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    container_name: miapp-back-front
+    ports:
+      - "8080:8080"
+    depends_on:
+      - sqlserver
+    environment:
+      MARIADB_HOST: localhost
+      MARIADB_USER: root
+      MARIADB_PASSWORD: 123456
+      POSTGRES_HOST: localhost
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: 123456
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      SA_PASSWORD: Sqlserver123$
+      ACCEPT_EULA: Y
+    ports:
+      - "1433:1433"

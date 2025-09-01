@@ -1,0 +1,14 @@
+server {
+    listen 8080 default_server;
+    listen [::]:8080 default_server;
+
+    root /var/www/html;
+    index index.html;
+
+    server_name _;
+
+    location / {
+        alias /var/www/html/;
+        try_files $uri $uri/ /index.html;
+    }
+}
