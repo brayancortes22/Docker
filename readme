@@ -1,10 +1,40 @@
-# Crea y corre imagen de docker nginx para el puerto 8080
-docker build -t mi-nginx-dotnet-mysql .
+# Mi Aplicación con Nginx, .NET, Python y MySQL
+
+# corre y creacion del contenedor
+
+docker build -t miapp-back-front .
+
+# correr el contenedor
+docker run -d -p 8080:8080 --name contenedor-back-front miapp-back-front
+# abrir el contenedor y hacer las migraciones manuales
+docker exec -it contenedor-back-front /bin/bash
 
 
-# Corre el contenedor
-docker run -p 8080:8080 --name mi_contenedor_nginx -d mi-nginx-dotnet-mysql
+# crear manualmente la bd para Django
 
-# 
-docker build -t mi-nginx-dotnet-mysql .
-docker run -d -p 8080:8080 --name miapp mi-nginx-dotnet-mysql
+service mariadb start
+
+mysql -u root 
+
+ALTER USER 'root'@'localhost' IDENTIFIED BY '123456';
+FLUSH PRIVILEGES;
+EXIT;
+
+mysql -u root -p
+
+CREATE DATABASE dbautogestionM CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+SHOW DATABASES;
+
+USE dbautogestionM;
+SHOW TABLES;
+
+# ejecutar el backend
+
+cd /app/Back-EndProyectoFinal2025
+
+source venv/bin/activate
+
+python manage.py migrate
+
+python manage.py runserver 0.0.0.0:8000
