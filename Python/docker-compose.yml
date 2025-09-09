@@ -1,0 +1,28 @@
+services:
+  app:
+    image: miapp-back-front
+    build: .
+    container_name: miapp-back-front
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mariadb
+    environment:
+      MARIADB_HOST: mariadb
+      MARIADB_USER: root
+      MARIADB_PASSWORD: 123456
+
+  mariadb:
+    image: mariadb:10.11
+    container_name: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: dbautogestion
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+volumes:
+  mariadb_data:
